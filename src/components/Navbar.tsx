@@ -1,6 +1,7 @@
 "use client";
 import type { ScreenId, Lang } from "@/lib/types";
 import type { Translations } from "@/lib/i18n";
+import { useLiff } from "@/context/LiffContext";
 
 interface Props {
   t: Translations;
@@ -18,21 +19,24 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar({ t, lang, setLang, active, go }: Props) {
+  const { loggedIn, profile, logout } = useLiff();
+
   const isActive = (id: ScreenId) =>
     id === active ||
-    (id === "home" && (active === "welcome" || active === "location")) ||
     (id === "mall-detail" && active === "reserve") ||
-    (id === "reserved" && active === "reserved") ||
-    (id === "parking" && active === "parked");
+    (id === "reserved"    && active === "reserved") ||
+    (id === "parking"     && active === "parked");
 
   return (
     <nav className="navbar">
       <div className="navInner">
+        {/* Logo */}
         <button className="navLogo" onClick={() => go("home")}>
           <div className="logoIcon">🗺️</div>
           <div className="logoText">Mall<span>Mate</span></div>
         </button>
 
+        {/* Nav links */}
         <div className="navLinks">
           {NAV_ITEMS.map(item => (
             <button
@@ -45,18 +49,45 @@ export default function Navbar({ t, lang, setLang, active, go }: Props) {
           ))}
         </div>
 
+        {/* Right side */}
         <div className="navRight">
+          {/* Lang toggle */}
           <div className="langRow">
             <button className={`langBtn ${lang === "th" ? "langBtnActive" : ""}`} onClick={() => setLang("th")}>TH</button>
             <button className={`langBtn ${lang === "en" ? "langBtnActive" : ""}`} onClick={() => setLang("en")}>EN</button>
           </div>
-          <button
-            className="navLink"
-            style={{ gap: 6 }}
-            onClick={() => go("profile-view")}
-          >
-            👤 {t.tabs.profile}
-          </button>
+
+          {/* Profile */}
+          {loggedIn && profile ? (
+            <button
+              className="navLink"
+              onClick={() => go("profile-view")}
+              style={{ gap: 8, padding: "4px 10px 4px 4px" }}
+              title={profile.displayName}
+            >
+              {profile.pictureUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.pictureUrl}
+                  alt={profile.displayName}
+                  width={28} height={28}
+                  style={{ borderRadius: "50%", objectFit: "cover" }}
+                />
+              ) : (
+                <span style={{
+                  width: 28, height: 28, background: "var(--red-dim)", borderRadius: "50%",
+                  display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 14,
+                }}>👤</span>
+              )}
+              <span style={{ maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontSize: 13 }}>
+                {profile.displayName}
+              </span>
+            </button>
+          ) : (
+            <button className="navLink" onClick={() => go("profile-view")}>
+              👤 {t.tabs.profile}
+            </button>
+          )}
         </div>
       </div>
     </nav>
