@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MallMate Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+    }
+
+    /* iOS-style phone frame */
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: #0a0a0a;
+      border-radius: 50px;
+      border: 12px solid #1a1a1a;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 28px;
+      background: #0a0a0a;
+      border-radius: 0 0 20px 20px;
+      z-index: 10;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .screen-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 60px 24px 40px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    }
+
+    .skip-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: #888;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      z-index: 5;
+    }
+
+    /* Screens */
+    .screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .screen h1 {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .screen h2 {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .screen p {
+      font-size: 16px;
+      color: #aaa;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    /* Feature icons/placeholders */
+    .icon-placeholder {
+      width: 80px;
+      height: 80px;
+      background: rgba(255, 45, 85, 0.15);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 16px;
+    }
+
+    /* Buttons */
+    .button {
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .button-primary {
+      background: #FF2D55;
+      color: white;
+      width: 100%;
+    }
+
+    .button-primary:hover {
+      background: #ff1144;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(255, 45, 85, 0.4);
+    }
+
+    .button-secondary {
+      background: transparent;
+      color: #aaa;
+      border: 1px solid #333;
+      width: 100%;
+    }
+
+    .button-secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #555;
+    }
+
+    /* Input field */
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #FF2D55;
+      background: #222;
+      box-shadow: 0 0 0 3px rgba(255, 45, 85, 0.1);
+    }
+
+    /* Feature cards */
+    .feature-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .feature-card-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 45, 85, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .feature-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feature-card p {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 0;
+    }
+
+    /* Progress indicator */
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: auto;
+      padding-bottom: 20px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #333;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: #FF2D55;
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    /* Language toggle */
+    .lang-toggle {
+      position: absolute;
+      top: 12px;
+      left: 16px;
+      display: flex;
+      gap: 4px;
+      z-index: 5;
+    }
+
+    .lang-btn {
+      background: #333;
+      border: none;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: all 0.2s ease;
+    }
+
+    .lang-btn.active {
+      background: #FF2D55;
+    }
+
+    /* Mall list item */
+    .mall-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .mall-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+      border-color: #555;
+    }
+
+    .mall-card.featured {
+      background: rgba(255, 45, 85, 0.15);
+      border-color: #FF2D55;
+    }
+
+    .mall-card.featured:hover {
+      background: rgba(255, 45, 85, 0.25);
+    }
+
+    .mall-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 45, 85, 0.2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .mall-info {
+      flex: 1;
+    }
+
+    .mall-info h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 6px 0;
+    }
+
+    .mall-info p {
+      font-size: 13px;
+      color: #888;
+      margin: 0 0 4px 0;
+    }
+
+    .mall-arrow {
+      display: flex;
+      align-items: center;
+      color: #FF2D55;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="design-canvas.jsx"></script>
+  <script type="text/babel">
+    const { DCSection, DCArtboard } = window;
+    const [React, ReactDOM] = [window.React, window.ReactDOM];
+    const { useState } = React;
+
+    // ============== TRANSLATIONS ==============
+    const translations = {
+      th: {
+        mallmate: 'MallMate',
+        tagline: 'นำทางห้าง จดจำที่จอดรถ ข้ามคิวจองโต๊ะ',
+        getStarted: 'เริ่มต้น',
+        skip: 'ข้าม',
+        next: 'ถัดไป',
+        realTimeNav: 'นำทางแบบ Real-Time',
+        realTimeNavDesc: 'ค้นหาร้านค้า ร้านอาหาร และบริการต่างๆ ด้วยแผนที่ห้างสดใจ',
+        saveSpot: 'บันทึกที่จอดรถ',
+        saveSpotDesc: 'จำว่าจอดรถไว้ที่ไหน กลับมาหารถของคุณได้ในครั้งเดียว',
+        skipLine: 'ข้ามคิวจอง',
+        skipLineDesc: 'จองที่ของคุณที่ร้านอาหารหรือบริการใดๆ ในห้างได้ทันที',
+        enterPhone: 'ระบุหมายเลขโทรศัพท์ของคุณ',
+        enterPhoneDesc: 'เราจะส่งรหัสยืนยันให้คุณ',
+        phoneNumber: 'หมายเลขโทรศัพท์',
+        sendCode: 'ส่งรหัส',
+        youreAllSet: 'เสร็จสิ้น!',
+        youreAllSetDesc: 'เริ่มสำรวจห้างใกล้เคียงและสนุกสนานในการช้อปปิ้ง',
+        exploreMalls: 'สำรวจห้าง',
+        smartCompanion: 'ผู้ช่วยเดินทางอัจฉริยะของคุณ',
+        enterNumber: 'ระบุหมายเลขของคุณ',
+        enterNumberDesc: 'เราจะยืนยันด้วยรหัสครั้งเดียว',
+        enterCode: 'ระบุรหัสยืนยัน',
+        codeDesc: 'ตรวจสอบ SMS เพื่อดูรหัส',
+        code: 'รหัส',
+        verify: 'ยืนยัน',
+        enableLocation: 'เปิดใช้งานตำแหน่ง',
+        enableLocationDesc: 'เราต้องใช้ตำแหน่งของคุณเพื่อแสดงห้างใกล้เคียงและนำทางคุณข้างใน',
+        allowLocation: 'อนุญาตตำแหน่ง',
+        mallsNearYou: 'ห้างใกล้เคียง',
+        mallsNearYouDesc: '3 ห้างในระยะ 5 กม.',
+        startExploring: 'เริ่มสำรวจ',
+        skipForNow: 'ข้ามในตอนนี้',
+        features: '✨ นำทางแบบ Real-Time • บันทึกที่จอดรถ • ข้ามคิวจอง',
+        currentLocation: '📍 ตำแหน่งปัจจุบัน',
+        bangkok: 'กรุงเทพ',
+        searchMalls: '🔍 ค้นหาห้าง'
+      },
+      en: {
+        mallmate: 'MallMate',
+        tagline: 'Navigate malls, reserve queues, never lose your parking spot.',
+        getStarted: 'Get Started',
+        skip: 'Skip',
+        next: 'Next',
+        realTimeNav: 'Real-Time Navigation',
+        realTimeNavDesc: 'Find shops, restaurants, and services instantly with live floor maps.',
+        saveSpot: 'Save Your Spot',
+        saveSpotDesc: 'Remember where you parked. Navigate back to your car with one tap.',
+        skipLine: 'Skip the Line',
+        skipLineDesc: 'Reserve your spot at any restaurant or service in the mall instantly.',
+        enterPhone: 'Enter Your Phone',
+        enterPhoneDesc: 'We\'ll send you a verification code.',
+        phoneNumber: 'Phone Number',
+        sendCode: 'Send Code',
+        youreAllSet: 'You\'re All Set!',
+        youreAllSetDesc: 'Start exploring malls near you and make the most of your visit.',
+        exploreMalls: 'Explore Malls',
+        smartCompanion: 'Your intelligent mall companion',
+        enterNumber: 'Enter Your Number',
+        enterNumberDesc: 'We\'ll verify it with a one-time code.',
+        enterCode: 'Enter Verification Code',
+        codeDesc: 'Check your SMS for the code.',
+        code: 'Code',
+        verify: 'Verify',
+        enableLocation: 'Enable Location',
+        enableLocationDesc: 'We need your location to show malls nearby and navigate you inside.',
+        allowLocation: 'Allow Location',
+        mallsNearYou: 'Malls Near You',
+        mallsNearYouDesc: '3 malls within 5 km',
+        startExploring: 'Start Exploring',
+        skipForNow: 'Skip for Now',
+        features: '✨ Real-time navigation • Save parking • Skip queues',
+        currentLocation: '📍 Current Location',
+        bangkok: 'Bangkok',
+        searchMalls: '🔍 Search Malls'
+      }
+    };
+
+    // ============== VARIATION 1: Classic Flow ==============
+    function Variation1({ lang = 'en' }) {
+      const t = translations[lang];
+      return (
+        <div className="phone-frame">
+          <div className="screen-content">
+            <div className="lang-toggle">
+              <button className={`lang-btn ${lang === 'th' ? 'active' : ''}`}>TH</button>
+              <button className={`lang-btn ${lang === 'en' ? 'active' : ''}`}>EN</button>
+            </div>
+            <button className="skip-btn">Skip</button>
+            <div className="screen">
+              <div>
+                <div className="icon-placeholder">🗺️</div>
+                <h1>{t.mallmate}</h1>
+                <p>{t.tagline}</p>
+              </div>
+              <div style={{ marginTop: 'auto' }}>
+                <button className="button button-primary">{t.getStarted}</button>
+                <button className="button button-secondary" style={{ marginTop: 12 }}>{t.skip}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============== VARIATION 2: Feature Cards ==============
+    function Variation2({ lang = 'en' }) {
+      const t = translations[lang];
+      return (
+        <div className="phone-frame">
+          <div className="screen-content">
+            <div className="lang-toggle">
+              <button className={`lang-btn ${lang === 'th' ? 'active' : ''}`}>TH</button>
+              <button className={`lang-btn ${lang === 'en' ? 'active' : ''}`}>EN</button>
+            </div>
+            <button className="skip-btn">Skip</button>
+            <div className="screen">
+              <div>
+                <h1>{t.mallmate}</h1>
+                <p>{t.smartCompanion}</p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 20 }}>
+                <div className="feature-card">
+                  <div className="feature-card-icon">📍</div>
+                  <div>
+                    <h3>{t.realTimeNav}</h3>
+                    <p>{t.realTimeNavDesc}</p>
+                  </div>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-card-icon">🅿️</div>
+                  <div>
+                    <h3>{t.saveSpot}</h3>
+                    <p>{t.saveSpotDesc}</p>
+                  </div>
+                </div>
+                <div className="feature-card">
+                  <div className="feature-card-icon">⏰</div>
+                  <div>
+                    <h3>{t.skipLine}</h3>
+                    <p>{t.skipLineDesc}</p>
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginTop: 'auto' }}>
+                <button className="button button-primary">{t.next}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============== VARIATION 3: Minimalist ==============
+    function Variation3({ lang = 'en' }) {
+      const t = translations[lang];
+      return (
+        <div className="phone-frame">
+          <div className="screen-content">
+            <div className="lang-toggle">
+              <button className={`lang-btn ${lang === 'th' ? 'active' : ''}`}>TH</button>
+              <button className={`lang-btn ${lang === 'en' ? 'active' : ''}`}>EN</button>
+            </div>
+            <button className="skip-btn">{t.skip}</button>
+            <div className="screen">
+              <div>
+                <h1 style={{ fontSize: 48, marginBottom: 24 }}>{t.mallmate}</h1>
+                <p style={{ fontSize: 18, color: '#ccc', lineHeight: 1.8, marginBottom: 32 }}>
+                  {t.tagline}
+                </p>
+              </div>
+              <div style={{ marginTop: 'auto' }}>
+                <button className="button button-primary" style={{ marginBottom: 12 }}>{t.getStarted}</button>
+                <button className="button button-secondary">{t.skipForNow}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============== VARIATION 4: Animated Hero ==============
+    function Variation4({ lang = 'en' }) {
+      const t = translations[lang];
+      return (
+        <div className="phone-frame">
+          <div className="screen-content">
+            <div className="lang-toggle">
+              <button className={`lang-btn ${lang === 'th' ? 'active' : ''}`}>TH</button>
+              <button className={`lang-btn ${lang === 'en' ? 'active' : ''}`}>EN</button>
+            </div>
+            <button className="skip-btn">{t.skip}</button>
+            <div className="screen">
+              <div style={{ textAlign: 'center', marginBottom: 40 }}>
+                <div style={{
+                  width: 120,
+                  height: 120,
+                  background: 'rgba(255, 45, 85, 0.2)',
+                  borderRadius: 30,
+                  margin: '0 auto 24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 60,
+                  animation: 'float 3s ease-in-out infinite'
+                }}>
+                  🗺️
+                </div>
+                <h1 style={{ marginBottom: 16 }}>{t.mallmate}</h1>
+                <p>{t.smartCompanion}</p>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 'auto' }}>
+                <div style={{ padding: 16, background: 'rgba(255,45,85,0.1)', borderRadius: 14, border: '1px solid rgba(255,45,85,0.2)' }}>
+                  <p style={{ fontSize: 14, margin: 0 }}>{t.features}</p>
+                </div>
+                <button className="button button-primary">{t.getStarted}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============== HOME SCREEN ==============
+    function HomeScreen({ lang = 'en' }) {
+      const t = translations[lang];
+      const mallsTh = [
+        {
+          name: 'เซนทรัลเวิลด์',
+          distance: '2.3 km',
+          stores: '500+ ร้าน',
+          icon: '🏢',
+          featured: true
+        },
+        {
+          name: 'สยามพารากอน',
+          distance: '1.8 km',
+          stores: '350+ ร้าน',
+          icon: '🏬'
+        },
+        {
+          name: 'เอมควอเทียร์',
+          distance: '3.1 km',
+          stores: '280+ ร้าน',
+          icon: '🏘️'
+        }
+      ];
+
+      const mallsEn = [
+        {
+          name: 'Central World',
+          distance: '2.3 km',
+          stores: '500+ stores',
+          icon: '🏢',
+          featured: true
+        },
+        {
+          name: 'Siam Paragon',
+          distance: '1.8 km',
+          stores: '350+ stores',
+          icon: '🏬'
+        },
+        {
+          name: 'EmQuartier',
+          distance: '3.1 km',
+          stores: '280+ stores',
+          icon: '🏘️'
+        }
+      ];
+
+      const malls = lang === 'th' ? mallsTh : mallsEn;
+
+      return (
+        <div className="phone-frame">
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+            overflow: 'hidden'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '16px 24px',
+              paddingTop: '60px',
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div>
+                  <p style={{ fontSize: 12, color: '#888', margin: 0, marginBottom: 4 }}>{t.currentLocation}</p>
+                  <h2 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>{t.bangkok}</h2>
+                </div>
+                <div className="lang-toggle">
+                  <button className={`lang-btn ${lang === 'th' ? 'active' : ''}`}>TH</button>
+                  <button className={`lang-btn ${lang === 'en' ? 'active' : ''}`}>EN</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Malls List */}
+            <div style={{
+              flex: 1,
+              overflow: 'auto',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12
+            }}>
+              {malls.map((mall, idx) => (
+                <div
+                  key={idx}
+                  className={`mall-card ${mall.featured ? 'featured' : ''}`}
+                >
+                  <div className="mall-icon">{mall.icon}</div>
+                  <div className="mall-info">
+                    <h3>{mall.name}</h3>
+                    <p>📍 {mall.distance}</p>
+                    <p>{mall.stores}</p>
+                  </div>
+                  <div className="mall-arrow">→</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom Action Bar */}
+            <div style={{
+              padding: '16px 24px 40px',
+              borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+              background: 'rgba(0, 0, 0, 0.3)'
+            }}>
+              <button className="button button-primary">{t.searchMalls}</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============== RENDER ALL VARIATIONS ==============
+    ReactDOM.render(
+      <DCSection id="mallmate-onboarding" title="MallMate Onboarding – 4 Signup Variations + Home">
+        <DCArtboard id="var1-en" label="Variation 1: Welcome (English)" width={390} height={844}>
+          <Variation1 lang="en" />
+        </DCArtboard>
+        <DCArtboard id="var1-th" label="Variation 1: Welcome (Thai)" width={390} height={844}>
+          <Variation1 lang="th" />
+        </DCArtboard>
+        <DCArtboard id="var2-en" label="Variation 2: Features (English)" width={390} height={844}>
+          <Variation2 lang="en" />
+        </DCArtboard>
+        <DCArtboard id="var2-th" label="Variation 2: Features (Thai)" width={390} height={844}>
+          <Variation2 lang="th" />
+        </DCArtboard>
+        <DCArtboard id="var3-en" label="Variation 3: Minimalist (English)" width={390} height={844}>
+          <Variation3 lang="en" />
+        </DCArtboard>
+        <DCArtboard id="var3-th" label="Variation 3: Minimalist (Thai)" width={390} height={844}>
+          <Variation3 lang="th" />
+        </DCArtboard>
+        <DCArtboard id="var4-en" label="Variation 4: Hero (English)" width={390} height={844}>
+          <Variation4 lang="en" />
+        </DCArtboard>
+        <DCArtboard id="var4-th" label="Variation 4: Hero (Thai)" width={390} height={844}>
+          <Variation4 lang="th" />
+        </DCArtboard>
+        <DCArtboard id="home-en" label="Home Screen: Malls Nearby (English)" width={390} height={844}>
+          <HomeScreen lang="en" />
+        </DCArtboard>
+        <DCArtboard id="home-th" label="Home Screen: Malls Nearby (Thai)" width={390} height={844}>
+          <HomeScreen lang="th" />
+        </DCArtboard>
+      </DCSection>,
+      document.getElementById('root')
+    );
+  </script>
+
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</body>
+</html>
