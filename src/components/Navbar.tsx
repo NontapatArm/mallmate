@@ -29,7 +29,8 @@ export default function Navbar({ t, lang, setLang, active, go }: Props) {
     <nav className="navbar">
       <div className="navInner">
         <button className="navLogo" onClick={() => go("home")}>
-          🗺️ Mall<span>Mate</span>
+          <div className="logoIcon">🗺️</div>
+          <div className="logoText">Mall<span>Mate</span></div>
         </button>
 
         <div className="navLinks">

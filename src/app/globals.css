@@ -70,7 +70,7 @@ html, body {
 .navLogo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 20px;
   font-weight: 700;
   color: var(--text);
@@ -78,8 +78,24 @@ html, body {
   text-decoration: none;
   margin-right: 16px;
   flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  letter-spacing: -0.3px;
 }
-.navLogo span { color: var(--red); }
+.navLogo .logoIcon {
+  width: 34px;
+  height: 34px;
+  background: var(--red);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.navLogo .logoText { color: var(--text); }
+.navLogo .logoText span { color: var(--red); }
 
 .navLinks {
   display: flex;
@@ -104,9 +120,8 @@ html, body {
   align-items: center;
   gap: 6px;
 }
-.navLink:hover   { color: var(--text); background: rgba(255,255,255,0.05); }
-.navLinkActive   { color: var(--text) !important; background: rgba(255,45,85,0.1) !important; }
-.navLinkActive   { color: var(--red) !important; }
+.navLink:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.navLinkActive { color: var(--red) !important; background: rgba(255,45,85,0.08) !important; }
 
 .navRight {
   display: flex;
