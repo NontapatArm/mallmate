@@ -124,6 +124,25 @@ export async function getActiveParking() {
   return data;
 }
 
+export async function upsertLineProfile(profile: {
+  userId: string;
+  displayName: string;
+  pictureUrl?: string;
+  statusMessage?: string;
+}) {
+  const { error } = await supabase
+    .from("line_profiles")
+    .upsert({
+      line_user_id:   profile.userId,
+      display_name:   profile.displayName,
+      picture_url:    profile.pictureUrl    ?? null,
+      status_message: profile.statusMessage ?? null,
+      last_seen_at:   new Date().toISOString(),
+    }, { onConflict: "line_user_id" });
+
+  if (error) console.warn("Failed to save LINE profile:", error.message);
+}
+
 export async function getMyReservations() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];

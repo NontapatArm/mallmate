@@ -42,7 +42,14 @@ export function LiffProvider({ children }: { children: React.ReactNode }) {
 
         if (loggedInNow) {
           const p = await getLineProfile();
-          if (!cancelled) setProfile(p);
+          if (!cancelled) {
+            setProfile(p);
+            // Save / refresh LINE profile in Supabase
+            if (p) {
+              const { upsertLineProfile } = await import("@/lib/supabase");
+              await upsertLineProfile(p);
+            }
+          }
         }
       } catch (err) {
         console.warn("LIFF init failed:", err);
