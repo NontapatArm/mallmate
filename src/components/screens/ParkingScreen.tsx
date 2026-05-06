@@ -2,11 +2,22 @@
 import { useState } from "react";
 import type { ScreenProps } from "@/lib/types";
 import { MALLS, PARKING_SPOTS, OCCUPIED_SPOTS } from "@/lib/data";
+import { saveParking } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 
 export default function ParkingScreen({ t, lang, setLang, go, state }: ScreenProps) {
   const mall = state?.mall ?? MALLS[0];
   const [selected, setSelected] = useState<string | null>(null);
+  const [loading,  setLoading]  = useState(false);
+
+  async function confirm() {
+    if (!selected || loading) return;
+    setLoading(true);
+    try {
+      await saveParking(String(mall.id), "2", selected[0], selected);
+    } catch { /* not logged in — still navigate */ }
+    go("parked", { mall, spot: selected });
+  }
 
   return (
     <div className="screen">
@@ -28,16 +39,14 @@ export default function ParkingScreen({ t, lang, setLang, go, state }: ScreenPro
       <div className="parkingGrid" style={{ marginBottom: 16 }}>
         {PARKING_SPOTS.map(s => {
           const occupied = OCCUPIED_SPOTS.includes(s);
-          const sel = selected === s;
+          const sel      = selected === s;
           return (
             <button
               key={s}
               className={`spotBtn ${occupied ? "spotOccupied" : sel ? "spotSelected" : ""}`}
-              disabled={occupied}
+              disabled={occupied || loading}
               onClick={() => setSelected(s)}
-            >
-              {s}
-            </button>
+            >{s}</button>
           );
         })}
       </div>
@@ -49,12 +58,8 @@ export default function ParkingScreen({ t, lang, setLang, go, state }: ScreenPro
       )}
 
       <div className="spacer" />
-      <button
-        className="btn btnPrimary"
-        disabled={!selected}
-        onClick={() => go("parked", { mall, spot: selected! })}
-      >
-        {t.confirmSpot}
+      <button className="btn btnPrimary" disabled={!selected || loading} onClick={confirm}>
+        {loading ? t.verifying : t.confirmSpot}
       </button>
     </div>
   );

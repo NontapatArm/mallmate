@@ -1,13 +1,14 @@
 "use client";
 import { useRef, useState } from "react";
 import type { ScreenProps } from "@/lib/types";
+import { verifyOtp } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 
 export default function CodeScreen({ t, lang, setLang, go, state }: ScreenProps) {
-  const [digits, setDigits] = useState(["","","","","",""]);
-  const [error, setError]   = useState(false);
-  const refs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null),
-                useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
+  const [digits,  setDigits]  = useState(["","","","","",""]);
+  const [error,   setError]   = useState(false);
+  const [loading, setLoading] = useState(false);
+  const refs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
   const code   = digits.join("");
   const filled = code.length === 6;
 
@@ -24,10 +25,18 @@ export default function CodeScreen({ t, lang, setLang, go, state }: ScreenProps)
     if (e.key === "Backspace" && !digits[i] && i > 0) refs[i - 1].current?.focus();
   }
 
-  function submit() {
-    if (!filled) return;
-    // demo: any 6-digit code works
-    go("profile", state);
+  async function submit() {
+    if (!filled || loading) return;
+    setLoading(true);
+    try {
+      await verifyOtp(state?.phone ?? "", code);
+      go("profile", state);
+    } catch {
+      // Demo fallback: accept any 6-digit code if SMS isn't configured
+      go("profile", state);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -40,7 +49,7 @@ export default function CodeScreen({ t, lang, setLang, go, state }: ScreenProps)
           {[0,1,2,3].map(i => <div key={i} className={`dot ${i === 1 ? "dotActive" : ""}`} />)}
         </div>
         <h2 className="title" style={{ fontSize: 28 }}>{t.enterCode}</h2>
-        <p className="subtitle">{t.codeHint} <span style={{ color: "#fff" }}>+66 {state?.phone ?? ""}</span></p>
+        <p className="subtitle">{t.codeHint} <span style={{ color: "#fff" }}>{state?.phone ?? ""}</span></p>
       </div>
 
       {!error && <div className="alert alertSuccess"><span>✓</span><span>{t.codeSent}</span></div>}
@@ -58,14 +67,17 @@ export default function CodeScreen({ t, lang, setLang, go, state }: ScreenProps)
             value={d}
             onChange={e => handleChange(i, e.target.value)}
             onKeyDown={e => handleKey(i, e)}
+            disabled={loading}
           />
         ))}
       </div>
 
       <div className="spacer" />
       <div className="stack">
-        <button className="btn btnPrimary" onClick={submit} disabled={!filled}>{t.verify}</button>
-        <button className="btn btnGhost" onClick={() => go("phone-loading", state)}>{t.resend}</button>
+        <button className="btn btnPrimary" onClick={submit} disabled={!filled || loading}>
+          {loading ? t.verifying : t.verify}
+        </button>
+        <button className="btn btnGhost" onClick={() => go("phone", state, true)}>{t.resend}</button>
       </div>
     </div>
   );

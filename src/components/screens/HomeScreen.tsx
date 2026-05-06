@@ -1,13 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ScreenProps } from "@/lib/types";
-import { MALLS } from "@/lib/data";
+import type { Mall } from "@/lib/types";
+import { fetchMalls } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 import TabBar from "@/components/TabBar";
 
 export default function HomeScreen({ t, lang, setLang, go }: ScreenProps) {
-  const [search, setSearch] = useState("");
-  const filtered = MALLS.filter(m => m.name.toLowerCase().includes(search.toLowerCase()));
+  const [search,  setSearch]  = useState("");
+  const [malls,   setMalls]   = useState<Mall[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchMalls()
+      .then(setMalls)
+      .catch(() => {/* fallback to empty */})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = malls.filter(m =>
+    m.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="screen">
@@ -27,24 +40,30 @@ export default function HomeScreen({ t, lang, setLang, go }: ScreenProps) {
         />
       </div>
 
-      <div className="stack">
-        {filtered.map(m => (
-          <div
-            key={m.id}
-            className={`mallCard ${m.featured ? "mallCardFeatured" : ""}`}
-            onClick={() => go("mall-detail", { mall: m })}
-          >
-            <div className="mallIcon">{m.icon}</div>
-            <div className="mallInfo">
-              <h3>{m.name}</h3>
-              <p>📍 {m.dist} {t.away}</p>
-              <p>{m.cnt} {t.stores}</p>
-              {m.featured && <span className="badge">{t.featured}</span>}
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", padding: 40 }}>
+          <div className="spinner" />
+        </div>
+      ) : (
+        <div className="stack">
+          {filtered.map(m => (
+            <div
+              key={m.id}
+              className={`mallCard ${m.featured ? "mallCardFeatured" : ""}`}
+              onClick={() => go("mall-detail", { mall: m })}
+            >
+              <div className="mallIcon">{m.icon}</div>
+              <div className="mallInfo">
+                <h3>{m.name}</h3>
+                <p>📍 {m.dist} {t.away}</p>
+                <p>{m.cnt} {t.stores}</p>
+                {m.featured && <span className="badge">{t.featured}</span>}
+              </div>
+              <span className="settingsArrow" style={{ marginLeft: "auto", alignSelf: "center" }}>›</span>
             </div>
-            <span className="settingsArrow" style={{ marginLeft: "auto", alignSelf: "center" }}>›</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="spacer" />
       <TabBar active="home" t={t} go={go} />

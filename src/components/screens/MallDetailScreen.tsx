@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
-import type { ScreenProps } from "@/lib/types";
-import { MALLS, STORES } from "@/lib/data";
+import { useEffect, useState } from "react";
+import type { ScreenProps, Store } from "@/lib/types";
+import { MALLS } from "@/lib/data";
+import { fetchStores } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 
 type StoreTab = "restaurants" | "services" | "shopping";
-
-const TAB_TYPE: Record<StoreTab, string> = {
+const TAB_TYPE: Record<StoreTab, Store["type"]> = {
   restaurants: "restaurant",
   services:    "services",
   shopping:    "shopping",
@@ -14,9 +14,18 @@ const TAB_TYPE: Record<StoreTab, string> = {
 
 export default function MallDetailScreen({ t, lang, setLang, go, state }: ScreenProps) {
   const mall = state?.mall ?? MALLS[0];
-  const [tab, setTab] = useState<StoreTab>("restaurants");
+  const [tab,     setTab]     = useState<StoreTab>("restaurants");
+  const [stores,  setStores]  = useState<Store[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const shown = STORES.filter(s => s.type === TAB_TYPE[tab]);
+  useEffect(() => {
+    fetchStores(String(mall.id))
+      .then(setStores)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [mall.id]);
+
+  const shown = stores.filter(s => s.type === TAB_TYPE[tab]);
 
   return (
     <div className="screen">
@@ -46,7 +55,7 @@ export default function MallDetailScreen({ t, lang, setLang, go, state }: Screen
               padding: "8px 14px", borderRadius: 10, border: "none", cursor: "pointer",
               fontFamily: "inherit", fontSize: 13, fontWeight: 600,
               background: tab === k ? "var(--red)" : "#1a1a1a",
-              color: tab === k ? "#fff" : "var(--muted)",
+              color:      tab === k ? "#fff"       : "var(--muted)",
               transition: "all 0.15s",
             }}
           >
@@ -55,29 +64,45 @@ export default function MallDetailScreen({ t, lang, setLang, go, state }: Screen
         ))}
       </div>
 
-      <div className="stack">
-        {shown.map(s => (
-          <div key={s.id} className="storeItem" onClick={() => s.wait > 0 ? go("reserve", { mall, store: s }) : undefined}>
-            <div className="storeIcon">{s.icon}</div>
-            <div className="storeDetail">
-              <h4>{s.name}</h4>
-              <p>{t.level} {s.floor}{s.wait > 0 ? ` · ~${s.wait} ${t.minutes}` : ""}</p>
+      {loading ? (
+        <div style={{ display: "flex", justifyContent: "center", padding: 24 }}>
+          <div className="spinner" />
+        </div>
+      ) : (
+        <div className="stack">
+          {shown.length === 0 && (
+            <p style={{ color: "var(--muted)", fontSize: 14, textAlign: "center", padding: 24 }}>
+              No {tab} found
+            </p>
+          )}
+          {shown.map(s => (
+            <div key={s.id} className="storeItem" onClick={() => s.wait > 0 ? go("reserve", { mall, store: s }) : undefined}>
+              <div className="storeIcon">{s.icon}</div>
+              <div className="storeDetail">
+                <h4>{s.name}</h4>
+                <p>{t.level} {s.floor}{s.wait > 0 ? ` · ~${s.wait} ${t.minutes}` : ""}</p>
+              </div>
+              {s.wait > 0 && (
+                <button
+                  className="storeAction"
+                  onClick={e => { e.stopPropagation(); go("reserve", { mall, store: s }); }}
+                >
+                  {t.queueReserve}
+                </button>
+              )}
             </div>
-            {s.wait > 0 && (
-              <button
-                className="storeAction"
-                onClick={e => { e.stopPropagation(); go("reserve", { mall, store: s }); }}
-              >
-                {t.queueReserve}
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="spacer" />
       <div className="row" style={{ marginTop: 16 }}>
-        <button className="btn btnPrimary" style={{ flex: 1 }} onClick={() => go("reserve", { mall, store: STORES[0] })}>
+        <button
+          className="btn btnPrimary"
+          style={{ flex: 1 }}
+          onClick={() => { if (stores[0]) go("reserve", { mall, store: stores[0] }); }}
+          disabled={stores.length === 0}
+        >
           {t.queueReserve}
         </button>
         <button className="btn btnGhost" style={{ flex: 1 }} onClick={() => go("parking", { mall })}>

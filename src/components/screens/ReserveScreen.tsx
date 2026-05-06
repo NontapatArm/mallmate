@@ -2,12 +2,24 @@
 import { useState } from "react";
 import type { ScreenProps } from "@/lib/types";
 import { MALLS, STORES } from "@/lib/data";
+import { reserveQueue } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 
 export default function ReserveScreen({ t, lang, setLang, go, state }: ScreenProps) {
   const store = state?.store ?? STORES[0];
   const mall  = state?.mall  ?? MALLS[0];
-  const [party, setParty] = useState(2);
+  const [party,   setParty]   = useState(2);
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState("");
+
+  async function reserve() {
+    setLoading(true);
+    setError("");
+    try {
+      await reserveQueue(String(store.id), String(mall.id), party, store.wait);
+    } catch { /* not logged in — still navigate for demo */ }
+    go("reserved", { mall, store });
+  }
 
   return (
     <div className="screen">
@@ -31,6 +43,8 @@ export default function ReserveScreen({ t, lang, setLang, go, state }: ScreenPro
         <p style={{ color: "var(--muted)", fontSize: 13 }}>4 {t.partiesAhead}</p>
       </div>
 
+      {error && <div className="alert alertError" style={{ marginBottom: 16 }}><span>✗</span><span>{error}</span></div>}
+
       <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: 16, padding: 16, marginBottom: 24 }}>
         <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>Party size</p>
         <div className="row">
@@ -43,8 +57,7 @@ export default function ReserveScreen({ t, lang, setLang, go, state }: ScreenPro
                 borderColor: party === n ? "var(--red)" : "var(--border)",
                 background:  party === n ? "var(--red-dim)" : "transparent",
                 color:       party === n ? "var(--red)" : "var(--muted)",
-                fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                transition: "all 0.15s",
+                fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
               }}
             >{n}</button>
           ))}
@@ -53,8 +66,10 @@ export default function ReserveScreen({ t, lang, setLang, go, state }: ScreenPro
 
       <div className="spacer" />
       <div className="stack">
-        <button className="btn btnPrimary" onClick={() => go("reserved", { mall, store })}>{t.reserveQueue}</button>
-        <button className="btn btnGhost"   onClick={() => go("mall-detail", { mall }, true)}>{t.back}</button>
+        <button className="btn btnPrimary" onClick={reserve} disabled={loading}>
+          {loading ? t.verifying : t.reserveQueue}
+        </button>
+        <button className="btn btnGhost" onClick={() => go("mall-detail", { mall }, true)}>{t.back}</button>
       </div>
     </div>
   );

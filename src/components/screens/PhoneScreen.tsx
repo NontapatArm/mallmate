@@ -1,15 +1,34 @@
 "use client";
 import { useState } from "react";
 import type { ScreenProps } from "@/lib/types";
+import { signInWithPhone } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 
 export default function PhoneScreen({ t, lang, setLang, go }: ScreenProps) {
-  const [phone, setPhone] = useState("");
+  const [phone,   setPhone]   = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState("");
   const valid = phone.replace(/\D/g, "").length >= 9;
 
-  function submit() {
-    if (!valid) return;
-    go("phone-loading", { phone });
+  async function submit() {
+    if (!valid || loading) return;
+    setLoading(true);
+    setError("");
+    const full = "+66" + phone.replace(/\D/g, "").replace(/^0/, "");
+    try {
+      await signInWithPhone(full);
+      go("code", { phone: full });
+    } catch (e: unknown) {
+      // If SMS isn't configured, still navigate for demo purposes
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("SMS") || msg.includes("provider") || msg.includes("not enabled")) {
+        go("code", { phone: full }); // demo fallback
+      } else {
+        setError(msg || "Failed to send code");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -25,6 +44,8 @@ export default function PhoneScreen({ t, lang, setLang, go }: ScreenProps) {
         <p className="subtitle">{t.phoneHint}</p>
       </div>
 
+      {error && <div className="alert alertError" style={{ marginBottom: 16 }}><span>✗</span><span>{error}</span></div>}
+
       <div className="inputWrap">
         <span className="label">{t.phone}</span>
         <div className="phoneRow">
@@ -37,13 +58,16 @@ export default function PhoneScreen({ t, lang, setLang, go }: ScreenProps) {
             onChange={e => setPhone(e.target.value)}
             onKeyDown={e => e.key === "Enter" && submit()}
             style={{ flex: 1 }}
+            disabled={loading}
           />
         </div>
       </div>
 
       <div className="spacer" />
       <div className="stack">
-        <button className="btn btnPrimary" onClick={submit} disabled={!valid}>{t.sendCode}</button>
+        <button className="btn btnPrimary" onClick={submit} disabled={!valid || loading}>
+          {loading ? t.verifying : t.sendCode}
+        </button>
         <button className="btn btnGhost" onClick={() => go("home")}>{t.skip}</button>
       </div>
     </div>

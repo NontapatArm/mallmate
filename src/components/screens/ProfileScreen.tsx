@@ -1,11 +1,21 @@
 "use client";
 import { useState } from "react";
 import type { ScreenProps } from "@/lib/types";
+import { updateProfile } from "@/lib/supabase";
 import LangToggle from "@/components/LangToggle";
 
 export default function ProfileScreen({ t, lang, setLang, go, state }: ScreenProps) {
-  const [name,  setName]  = useState("");
-  const [email, setEmail] = useState("");
+  const [name,    setName]    = useState("");
+  const [email,   setEmail]   = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function save() {
+    setLoading(true);
+    try {
+      await updateProfile(name, email);
+    } catch { /* ignore if not logged in yet */ }
+    go("location", { ...state, name, email });
+  }
 
   return (
     <div className="screen">
@@ -31,8 +41,10 @@ export default function ProfileScreen({ t, lang, setLang, go, state }: ScreenPro
 
       <div className="spacer" />
       <div className="stack">
-        <button className="btn btnPrimary" onClick={() => go("location", { ...state, name, email })}>{t.saveProfile}</button>
-        <button className="btn btnGhost"   onClick={() => go("location", state)}>{t.skip}</button>
+        <button className="btn btnPrimary" onClick={save} disabled={loading}>
+          {loading ? t.verifying : t.saveProfile}
+        </button>
+        <button className="btn btnGhost" onClick={() => go("location", state)}>{t.skip}</button>
       </div>
     </div>
   );
