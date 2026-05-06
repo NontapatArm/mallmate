@@ -1,9 +1,8 @@
 "use client";
 import { useEffect } from "react";
 import type { ScreenProps } from "@/lib/types";
-import LangToggle from "@/components/LangToggle";
 
-export default function PhoneLoadingScreen({ t, lang, setLang, go, state }: ScreenProps) {
+export default function PhoneLoadingScreen({ t, go, state }: ScreenProps) {
   useEffect(() => {
     const timer = setTimeout(() => go("code", state), 1800);
     return () => clearTimeout(timer);
@@ -11,10 +10,11 @@ export default function PhoneLoadingScreen({ t, lang, setLang, go, state }: Scre
   }, []);
 
   return (
-    <div className="screen screenCenter">
-      <LangToggle lang={lang} setLang={setLang} />
-      <div className="spinner" style={{ marginBottom: 24 }} />
-      <p className="subtitle">{t.verifying}</p>
+    <div className="authWrap">
+      <div style={{ textAlign: "center" }}>
+        <div className="spinner" style={{ margin: "0 auto 20px" }} />
+        <p className="muted">{t.verifying}</p>
+      </div>
     </div>
   );
 }

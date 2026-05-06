@@ -3,73 +3,59 @@ import { useState } from "react";
 import type { ScreenProps } from "@/lib/types";
 import { MALLS, STORES } from "@/lib/data";
 import { reserveQueue } from "@/lib/supabase";
-import LangToggle from "@/components/LangToggle";
 
-export default function ReserveScreen({ t, lang, setLang, go, state }: ScreenProps) {
+export default function ReserveScreen({ t, go, state }: ScreenProps) {
   const store = state?.store ?? STORES[0];
   const mall  = state?.mall  ?? MALLS[0];
   const [party,   setParty]   = useState(2);
   const [loading, setLoading] = useState(false);
-  const [error,   setError]   = useState("");
 
   async function reserve() {
     setLoading(true);
-    setError("");
-    try {
-      await reserveQueue(String(store.id), String(mall.id), party, store.wait);
-    } catch { /* not logged in — still navigate for demo */ }
+    try { await reserveQueue(String(store.id), String(mall.id), party, store.wait); } catch { /* demo */ }
     go("reserved", { mall, store });
   }
 
   return (
-    <div className="screen">
-      <LangToggle lang={lang} setLang={setLang} />
-
-      <div className="navBar">
-        <button className="navBack" onClick={() => go("mall-detail", { mall }, true)}>←</button>
-        <span className="screenTitle">{store.name}</span>
-        <div className="navSpacer" />
+    <div className="pageContent pageContentMed">
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
+        <button className="btn btnGhost btnSm" onClick={() => go("mall-detail", { mall }, true)}>← {t.back}</button>
+        <h1 className="pageTitle" style={{ marginBottom: 0 }}>{store.name}</h1>
       </div>
 
-      <div className="mapPh" style={{ height: 140 }}>
-        <span style={{ fontSize: 36 }}>{store.icon}</span>
-        <span style={{ fontSize: 13 }}>{t.level} {store.floor}</span>
-      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }}>
+        <div>
+          <div className="mapPh" style={{ height: 200 }}>
+            <span style={{ fontSize: 48 }}>{store.icon}</span>
+            <span>{t.level} {store.floor}</span>
+          </div>
 
-      <div style={{ marginBottom: 24 }}>
-        <p style={{ fontSize: 15, marginBottom: 6 }}>
-          ⏱ {t.waitAvg}: <span style={{ color: "#fff", fontWeight: 600 }}>{store.wait} {t.minutes}</span>
-        </p>
-        <p style={{ color: "var(--muted)", fontSize: 13 }}>4 {t.partiesAhead}</p>
-      </div>
+          <div className="card mt16">
+            <p style={{ marginBottom: 4 }}>⏱ {t.waitAvg}: <span style={{ color: "var(--text)", fontWeight: 700 }}>{store.wait} {t.minutes}</span></p>
+            <p className="muted" style={{ fontSize: 13 }}>4 {t.partiesAhead}</p>
+          </div>
+        </div>
 
-      {error && <div className="alert alertError" style={{ marginBottom: 16 }}><span>✗</span><span>{error}</span></div>}
-
-      <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)", borderRadius: 16, padding: 16, marginBottom: 24 }}>
-        <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 12 }}>Party size</p>
-        <div className="row">
-          {[1,2,3,4].map(n => (
-            <button
-              key={n}
-              onClick={() => setParty(n)}
-              style={{
-                width: 44, height: 44, borderRadius: 10, border: "1.5px solid",
+        <div className="card">
+          <p style={{ fontWeight: 600, marginBottom: 16 }}>Party size</p>
+          <div className="row mb24" style={{ flexWrap: "wrap" }}>
+            {[1,2,3,4,5,6].map(n => (
+              <button key={n} onClick={() => setParty(n)} style={{
+                width: 48, height: 48, borderRadius: 10, border: "1.5px solid",
                 borderColor: party === n ? "var(--red)" : "var(--border)",
                 background:  party === n ? "var(--red-dim)" : "transparent",
                 color:       party === n ? "var(--red)" : "var(--muted)",
-                fontWeight: 600, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
-              }}
-            >{n}</button>
-          ))}
+                fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
+              }}>{n}</button>
+            ))}
+          </div>
+          <div className="stack">
+            <button className="btn btnPrimary btnFull" onClick={reserve} disabled={loading}>
+              {loading ? t.verifying : t.reserveQueue}
+            </button>
+            <button className="btn btnGhost btnFull" onClick={() => go("mall-detail", { mall }, true)}>{t.back}</button>
+          </div>
         </div>
-      </div>
-
-      <div className="spacer" />
-      <div className="stack">
-        <button className="btn btnPrimary" onClick={reserve} disabled={loading}>
-          {loading ? t.verifying : t.reserveQueue}
-        </button>
-        <button className="btn btnGhost" onClick={() => go("mall-detail", { mall }, true)}>{t.back}</button>
       </div>
     </div>
   );
