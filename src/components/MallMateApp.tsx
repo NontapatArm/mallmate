@@ -49,15 +49,16 @@ export default function MallMateApp() {
 
   const { ready, loggedIn } = useLiff();
 
-  // Auto-skip auth when LIFF is already logged in
+  // Auto-skip auth when LIFF is already logged in — runs after hydration only
   useEffect(() => {
     if (ready && loggedIn && AUTH_SCREENS.includes(screenId)) {
       setScreenId("home");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, loggedIn]);
 
-  const t      = LANG[lang];
-  const Screen = SCREENS[screenId];
+  const t       = LANG[lang];
+  const Screen  = SCREENS[screenId];
   const showNav = !AUTH_SCREENS.includes(screenId);
 
   function go(id: ScreenId, state: NavState | null = null, _isBack = false) {
@@ -65,18 +66,6 @@ export default function MallMateApp() {
     setScreenId(id);
     setNavState(state);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // Show loading spinner while LIFF initializes
-  if (!ready && typeof window !== "undefined") {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)" }}>
-        <div style={{ textAlign: "center" }}>
-          <div className="spinner" style={{ margin: "0 auto 16px" }} />
-          <p style={{ color: "var(--muted)", fontSize: 14 }}>Loading MallMate…</p>
-        </div>
-      </div>
-    );
   }
 
   return (

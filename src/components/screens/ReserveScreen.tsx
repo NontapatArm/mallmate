@@ -17,45 +17,69 @@ export default function ReserveScreen({ t, go, state }: ScreenProps) {
   }
 
   return (
-    <div className="pageContent pageContentMed">
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 32 }}>
-        <button className="btn btnGhost btnSm" onClick={() => go("mall-detail", { mall }, true)}>← {t.back}</button>
+    <div className="pageContent">
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+        <button className="btn btnGhost btnSm" onClick={() => go("mall-detail", { mall }, true)}>
+          ← {t.back}
+        </button>
         <h1 className="pageTitle" style={{ marginBottom: 0 }}>{store.name}</h1>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 24, alignItems: "start" }}>
-        <div>
-          <div className="mapPh" style={{ height: 200 }}>
-            <span style={{ fontSize: 48 }}>{store.icon}</span>
-            <span>{t.level} {store.floor}</span>
-          </div>
+      {/* Store map */}
+      <div className="mapPh" style={{ height: 180, marginBottom: 24 }}>
+        <span style={{ fontSize: 52 }}>{store.icon}</span>
+        <span style={{ color: "var(--muted)", fontSize: 14 }}>{t.level} {store.floor} · {mall.name}</span>
+      </div>
 
-          <div className="card mt16">
-            <p style={{ marginBottom: 4 }}>⏱ {t.waitAvg}: <span style={{ color: "var(--text)", fontWeight: 700 }}>{store.wait} {t.minutes}</span></p>
-            <p className="muted" style={{ fontSize: 13 }}>4 {t.partiesAhead}</p>
-          </div>
+      {/* Wait info */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: 12,
+        marginBottom: 28,
+      }}>
+        <div className="card" style={{ textAlign: "center" }}>
+          <p style={{ color: "var(--muted)", fontSize: 12, marginBottom: 6 }}>{t.waitAvg}</p>
+          <p style={{ fontSize: 32, fontWeight: 700, color: "var(--red)", lineHeight: 1 }}>{store.wait}</p>
+          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>{t.minutes}</p>
         </div>
+        <div className="card" style={{ textAlign: "center" }}>
+          <p style={{ color: "var(--muted)", fontSize: 12, marginBottom: 6 }}>{t.partiesAhead}</p>
+          <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1 }}>4</p>
+          <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>parties</p>
+        </div>
+      </div>
 
-        <div className="card">
-          <p style={{ fontWeight: 600, marginBottom: 16 }}>Party size</p>
-          <div className="row mb24" style={{ flexWrap: "wrap" }}>
-            {[1,2,3,4,5,6].map(n => (
-              <button key={n} onClick={() => setParty(n)} style={{
-                width: 48, height: 48, borderRadius: 10, border: "1.5px solid",
+      {/* Party size */}
+      <div className="card" style={{ marginBottom: 28 }}>
+        <p style={{ fontWeight: 600, marginBottom: 16 }}>Party size</p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[1,2,3,4,5,6].map(n => (
+            <button
+              key={n}
+              onClick={() => setParty(n)}
+              style={{
+                width: 52, height: 52, borderRadius: 12, border: "1.5px solid",
                 borderColor: party === n ? "var(--red)" : "var(--border)",
                 background:  party === n ? "var(--red-dim)" : "transparent",
                 color:       party === n ? "var(--red)" : "var(--muted)",
-                fontWeight: 700, cursor: "pointer", fontFamily: "inherit", transition: "all 0.15s",
-              }}>{n}</button>
-            ))}
-          </div>
-          <div className="stack">
-            <button className="btn btnPrimary btnFull" onClick={reserve} disabled={loading}>
-              {loading ? t.verifying : t.reserveQueue}
-            </button>
-            <button className="btn btnGhost btnFull" onClick={() => go("mall-detail", { mall }, true)}>{t.back}</button>
-          </div>
+                fontWeight: 700, fontSize: 18, cursor: "pointer",
+                fontFamily: "inherit", transition: "all 0.15s",
+              }}
+            >{n}</button>
+          ))}
         </div>
+      </div>
+
+      {/* CTA */}
+      <div className="stack">
+        <button className="btn btnPrimary btnFull" onClick={reserve} disabled={loading}>
+          {loading ? t.verifying : `⏰ ${t.reserveQueue}`}
+        </button>
+        <button className="btn btnGhost btnFull" onClick={() => go("mall-detail", { mall }, true)}>
+          {t.back}
+        </button>
       </div>
     </div>
   );
