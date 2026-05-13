@@ -18,12 +18,8 @@ export default function PhoneScreen({ t, lang, setLang, go }: ScreenProps) {
       go("code", { phone: full });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "";
-      if (msg.includes("SMS") || msg.includes("provider") || msg.includes("not enabled")) {
-        go("code", { phone: full });
-      } else {
-        setError(msg || "Failed to send code");
-        setLoading(false);
-      }
+      setError(msg || t.smsFailed);
+      setLoading(false);
     }
   }
 

@@ -1,5 +1,5 @@
 "use client";
-import type { ScreenId, Lang } from "@/lib/types";
+import type { ScreenId, Lang, Mall } from "@/lib/types";
 import type { Translations } from "@/lib/i18n";
 import { useLiff } from "@/context/LiffContext";
 
@@ -8,17 +8,18 @@ interface Props {
   lang: Lang;
   setLang: (l: Lang) => void;
   active: ScreenId;
-  go: (id: ScreenId) => void;
+  go: (id: ScreenId, state?: { mall: Mall } | null) => void;
+  lastMall: Mall | null;
 }
 
 const NAV_ITEMS = [
-  { id: "home"        as ScreenId, icon: "🏠", labelKey: "home"    as const },
-  { id: "mall-detail" as ScreenId, icon: "🗺️", labelKey: "map"     as const },
-  { id: "reserved"    as ScreenId, icon: "⏰", labelKey: "queues"  as const },
-  { id: "parking"     as ScreenId, icon: "🚗", labelKey: "parking" as const },
+  { id: "home"        as ScreenId, navigateTo: "home"     as ScreenId, icon: "🏠", labelKey: "home"    as const },
+  { id: "mall-detail" as ScreenId, navigateTo: "home"     as ScreenId, icon: "🗺️", labelKey: "map"     as const },
+  { id: "reserved"    as ScreenId, navigateTo: "reserved" as ScreenId, icon: "⏰", labelKey: "queues"  as const },
+  { id: "parking"     as ScreenId, navigateTo: "parking"  as ScreenId, icon: "🚗", labelKey: "parking" as const },
 ];
 
-export default function Navbar({ t, lang, setLang, active, go }: Props) {
+export default function Navbar({ t, lang, setLang, active, go, lastMall }: Props) {
   const { loggedIn, profile, logout } = useLiff();
 
   const isActive = (id: ScreenId) =>
@@ -42,7 +43,13 @@ export default function Navbar({ t, lang, setLang, active, go }: Props) {
             <button
               key={item.id}
               className={`navLink ${isActive(item.id) ? "navLinkActive" : ""}`}
-              onClick={() => go(item.id)}
+              onClick={() => {
+              if ((item.id === "mall-detail" || item.id === "parking") && lastMall) {
+                go(item.id === "mall-detail" ? "mall-detail" : "parking", { mall: lastMall });
+              } else {
+                go(item.navigateTo);
+              }
+            }}
             >
               {item.icon} {t.tabs[item.labelKey]}
             </button>

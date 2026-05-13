@@ -23,8 +23,13 @@ export default function CodeScreen({ t, lang, setLang, go, state }: ScreenProps)
   async function submit() {
     if (!filled || loading) return;
     setLoading(true);
-    try { await verifyOtp(state?.phone ?? "", code); } catch { /* demo fallback */ }
-    go("profile", state);
+    try {
+      await verifyOtp(state?.phone ?? "", code);
+      go("profile", state);
+    } catch {
+      setError(true);
+      setLoading(false);
+    }
   }
 
   return (

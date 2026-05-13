@@ -5,6 +5,15 @@ import { MALLS } from "@/lib/data";
 export default function ParkedScreen({ t, go, state }: ScreenProps) {
   const spot = state?.spot ?? "A3";
   const mall = state?.mall ?? MALLS[0];
+  const lat  = state?.lat;
+  const lng  = state?.lng;
+
+  function navigateToCar() {
+    const url = lat != null && lng != null
+      ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mall.name + " parking")}`;
+    window.open(url, "_blank");
+  }
 
   return (
     <div className="pageContent pageContentNarrow" style={{ margin: "0 auto", paddingTop: 60 }}>
@@ -21,7 +30,7 @@ export default function ParkedScreen({ t, go, state }: ScreenProps) {
       </div>
 
       <div className="stack">
-        <button className="btn btnPrimary btnFull" onClick={() => go("home")}>{t.navigateBack}</button>
+        <button className="btn btnPrimary btnFull" onClick={navigateToCar}>{t.navigateBack}</button>
         <button className="btn btnGhost btnFull"   onClick={() => go("home")}>{t.explore}</button>
       </div>
     </div>

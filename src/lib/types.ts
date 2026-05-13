@@ -14,7 +14,8 @@ export type ScreenId =
   | "parking"
   | "parked"
   | "profile-view"
-  | "settings";
+  | "settings"
+  | "report";
 
 export interface Mall {
   id: number;
@@ -31,7 +32,7 @@ export interface Store {
   name: string;
   floor: string;
   wait: number;
-  type: "restaurant" | "shopping" | "services";
+  type: "food_and_beverage" | "shopping" | "services";
 }
 
 export interface NavState {
@@ -41,6 +42,9 @@ export interface NavState {
   mall?: Mall;
   store?: Store;
   spot?: string;
+  reservationId?: string;
+  lat?: number;
+  lng?: number;
 }
 
 export interface ScreenProps {

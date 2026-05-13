@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import type { Lang, ScreenId, NavState } from "@/lib/types";
+import type { Lang, ScreenId, NavState, Mall } from "@/lib/types";
 import { LANG } from "@/lib/i18n";
 import { useLiff } from "@/context/LiffContext";
-import Navbar from "./Navbar";
+import { ensureAnonSession, fetchMalls } from "@/lib/supabase";
+import Navbar    from "./Navbar";
+import BottomNav from "./BottomNav";
 
 import WelcomeScreen      from "./screens/WelcomeScreen";
 import PhoneScreen        from "./screens/PhoneScreen";
@@ -19,6 +21,7 @@ import ParkingScreen      from "./screens/ParkingScreen";
 import ParkedScreen       from "./screens/ParkedScreen";
 import ProfileViewScreen  from "./screens/ProfileViewScreen";
 import SettingsScreen     from "./screens/SettingsScreen";
+import ReportScreen       from "./screens/ReportScreen";
 
 type ScreenComponent = React.ComponentType<Parameters<typeof WelcomeScreen>[0]>;
 
@@ -37,6 +40,7 @@ const SCREENS: Record<ScreenId, ScreenComponent> = {
   "parked":        ParkedScreen,
   "profile-view":  ProfileViewScreen,
   "settings":      SettingsScreen,
+  "report":        ReportScreen,
 };
 
 const AUTH_SCREENS: ScreenId[] = ["welcome", "phone", "phone-loading", "code", "profile", "location"];
@@ -46,6 +50,7 @@ export default function MallMateApp() {
   const [screenId, setScreenId] = useState<ScreenId>("welcome");
   const [navState, setNavState] = useState<NavState | null>(null);
   const [animKey,  setAnimKey]  = useState(0);
+  const [lastMall, setLastMall] = useState<Mall | null>(null);
 
   const { ready, loggedIn } = useLiff();
 
@@ -57,6 +62,25 @@ export default function MallMateApp() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, loggedIn]);
 
+  // Ensure every visitor has a Supabase session — call once on mount, then again on any app screen
+  useEffect(() => {
+    ensureAnonSession().catch(() => {});
+    // Set default mall to MBK Center (first mall from Supabase)
+    fetchMalls().then(malls => {
+      if (malls.length > 0) {
+        const mbk = malls.find(m => m.name.toLowerCase().includes("mbk")) ?? malls[0];
+        setLastMall(mbk);
+      }
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!AUTH_SCREENS.includes(screenId)) {
+      ensureAnonSession().catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenId]);
+
   const t       = LANG[lang];
   const Screen  = SCREENS[screenId];
   const showNav = !AUTH_SCREENS.includes(screenId);
@@ -65,17 +89,21 @@ export default function MallMateApp() {
     setAnimKey(k => k + 1);
     setScreenId(id);
     setNavState(state);
+    if (state?.mall) setLastMall(state.mall);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
     <div className="pageWrapper">
       {showNav && (
-        <Navbar t={t} lang={lang} setLang={setLang} active={screenId} go={go} />
+        <Navbar t={t} lang={lang} setLang={setLang} active={screenId} go={go} lastMall={lastMall} />
       )}
       <div key={animKey} className="pageFadeIn" style={{ flex: 1 }}>
         <Screen t={t} lang={lang} setLang={setLang} go={go} state={navState} />
       </div>
+      {showNav && (
+        <BottomNav t={t} lang={lang} active={screenId} go={go} lastMall={lastMall} />
+      )}
     </div>
   );
 }

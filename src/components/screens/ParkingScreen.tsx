@@ -1,19 +1,36 @@
 "use client";
 import { useState } from "react";
 import type { ScreenProps } from "@/lib/types";
-import { MALLS, PARKING_SPOTS, OCCUPIED_SPOTS } from "@/lib/data";
+import { MALLS, PARKING_SPOTS } from "@/lib/data";
 import { saveParking } from "@/lib/supabase";
 
 export default function ParkingScreen({ t, go, state }: ScreenProps) {
   const mall = state?.mall ?? MALLS[0];
   const [selected, setSelected] = useState<string | null>(null);
   const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState("");
 
   async function confirm() {
     if (!selected || loading) return;
     setLoading(true);
-    try { await saveParking(String(mall.id), "2", selected[0], selected); } catch { /* demo */ }
-    go("parked", { mall, spot: selected });
+
+    let lat: number | undefined;
+    let lng: number | undefined;
+    try {
+      const pos = await new Promise<GeolocationPosition>((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+      );
+      lat = pos.coords.latitude;
+      lng = pos.coords.longitude;
+    } catch { /* geolocation unavailable or denied — continue without coords */ }
+
+    try {
+      await saveParking(String(mall.id), "2", selected[0], selected);
+      go("parked", { mall, spot: selected, lat, lng });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "ไม่สามารถบันทึกที่จอดรถได้ กรุณาลองใหม่");
+      setLoading(false);
+    }
   }
 
   return (
@@ -47,13 +64,12 @@ export default function ParkingScreen({ t, go, state }: ScreenProps) {
         marginBottom: 24,
       }}>
         {PARKING_SPOTS.map(s => {
-          const occ = OCCUPIED_SPOTS.includes(s);
           const sel = selected === s;
           return (
             <button
               key={s}
-              className={`spotBtn ${occ ? "spotOccupied" : sel ? "spotSelected" : ""}`}
-              disabled={occ || loading}
+              className={`spotBtn ${sel ? "spotSelected" : ""}`}
+              disabled={loading}
               onClick={() => setSelected(s)}
             >
               {s}
@@ -65,9 +81,8 @@ export default function ParkingScreen({ t, go, state }: ScreenProps) {
       {/* Legend */}
       <div style={{ display: "flex", gap: 20, marginBottom: 24 }}>
         {[
-          { color: "var(--surface)",  border: "var(--border)",        label: "Available" },
-          { color: "var(--red)",      border: "var(--red)",            label: "Selected" },
-          { color: "#0d0d0d",         border: "var(--border)",         label: "Occupied" },
+          { color: "var(--surface)", border: "var(--border)", label: "Available" },
+          { color: "var(--red)",     border: "var(--red)",    label: "Selected"  },
         ].map(item => (
           <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{
@@ -79,6 +94,9 @@ export default function ParkingScreen({ t, go, state }: ScreenProps) {
           </div>
         ))}
       </div>
+
+      {/* Error */}
+      {error && <div className="alert alertError" style={{ marginBottom: 12 }}><span>✗</span><span>{error}</span></div>}
 
       {/* Selection summary + confirm */}
       {selected ? (

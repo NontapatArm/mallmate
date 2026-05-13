@@ -38,7 +38,7 @@ export const LANG: Record<string, Translations> = {
     open: "Open Now",
     mallDetail: "Mall Detail",
     floorMap: "Floor Map & Navigation",
-    restaurants: "Restaurants",
+    restaurants: "Food & Beverage",
     services: "Services",
     shopping: "Shopping",
     queueReserve: "Reserve Queue",
@@ -68,6 +68,28 @@ export const LANG: Record<string, Translations> = {
     language: "Language",
     version: "Version",
     logout: "Log Out",
+    cancelQueue: "Cancel Reservation",
+    cancelConfirm: "Cancel this queue?",
+    navigate: "Navigate",
+    mapView: "Map",
+    locating: "Getting location…",
+    smsFailed: "Could not send SMS. Please check your number.",
+    queueReady: "Your table is ready! 🎉",
+    queueWaiting: "Waiting in queue…",
+    visitsThisMonth: "visits this month",
+    savedMalls: "saved malls",
+    activityReport: "Activity Report",
+    queueHistory: "Queue History",
+    parkingHistory: "Parking History",
+    noQueueHistory: "No queue history yet",
+    noParkingHistory: "No parking history yet",
+    noFavorites: "No saved malls yet",
+    partySize: "Party size",
+    completed: "Completed",
+    cancelled: "Cancelled",
+    active: "Active",
+    expired: "Expired",
+    removeFavorite: "Remove",
     tabs: { home: "Home", map: "Map", queues: "Queues", parking: "Parking", profile: "Profile" },
     navFeatures: [
       { icon: "🗺️", title: "Real-time Navigation", desc: "Indoor maps for every floor of every mall." },
@@ -114,7 +136,7 @@ export const LANG: Record<string, Translations> = {
     open: "เปิดอยู่",
     mallDetail: "รายละเอียดห้าง",
     floorMap: "แผนที่ & นำทาง",
-    restaurants: "ร้านอาหาร",
+    restaurants: "อาหาร & เครื่องดื่ม",
     services: "บริการ",
     shopping: "ช็อปปิ้ง",
     queueReserve: "จองคิว",
@@ -144,6 +166,28 @@ export const LANG: Record<string, Translations> = {
     language: "ภาษา",
     version: "เวอร์ชัน",
     logout: "ออกจากระบบ",
+    cancelQueue: "ยกเลิกการจอง",
+    cancelConfirm: "ยืนยันการยกเลิกคิวนี้?",
+    navigate: "นำทาง",
+    mapView: "แผนที่",
+    locating: "กำลังระบุตำแหน่ง…",
+    smsFailed: "ส่ง SMS ไม่ได้ กรุณาตรวจสอบเบอร์โทรศัพท์",
+    queueReady: "ถึงคิวของคุณแล้ว! 🎉",
+    queueWaiting: "กำลังรอคิว…",
+    visitsThisMonth: "ครั้งเดือนนี้",
+    savedMalls: "ห้างที่บันทึก",
+    activityReport: "ประวัติการใช้งาน",
+    queueHistory: "ประวัติคิว",
+    parkingHistory: "ประวัติจอดรถ",
+    noQueueHistory: "ยังไม่มีประวัติคิว",
+    noParkingHistory: "ยังไม่มีประวัติจอดรถ",
+    noFavorites: "ยังไม่มีห้างที่บันทึกไว้",
+    partySize: "จำนวนคน",
+    completed: "เสร็จแล้ว",
+    cancelled: "ยกเลิก",
+    active: "กำลังใช้งาน",
+    expired: "หมดอายุ",
+    removeFavorite: "ลบ",
     tabs: { home: "หน้าแรก", map: "แผนที่", queues: "คิว", parking: "จอดรถ", profile: "โปรไฟล์" },
     navFeatures: [
       { icon: "🗺️", title: "นำทาง Real-time",   desc: "แผนที่ภายในทุกชั้นของทุกห้าง" },
@@ -167,6 +211,12 @@ export interface Translations {
   parkingSaved: string; parkingNote: string; navigateBack: string; explore: string;
   yourProfile: string; history: string; favorites: string; settings: string;
   notifications: string; darkMode: string; language: string; version: string; logout: string;
+  cancelQueue: string; cancelConfirm: string;
+  navigate: string; mapView: string; locating: string;
+  smsFailed: string; queueReady: string; queueWaiting: string; visitsThisMonth: string; savedMalls: string;
+  activityReport: string; queueHistory: string; parkingHistory: string;
+  noQueueHistory: string; noParkingHistory: string; noFavorites: string;
+  partySize: string; completed: string; cancelled: string; active: string; expired: string; removeFavorite: string;
   tabs: { home: string; map: string; queues: string; parking: string; profile: string; };
   navFeatures: Array<{ icon: string; title: string; desc: string; }>;
 }

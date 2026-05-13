@@ -1,19 +1,32 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ScreenProps } from "@/lib/types";
 import { MALLS, STORES } from "@/lib/data";
-import { reserveQueue } from "@/lib/supabase";
+import { reserveQueue, getQueueCount } from "@/lib/supabase";
 
 export default function ReserveScreen({ t, go, state }: ScreenProps) {
   const store = state?.store ?? STORES[0];
   const mall  = state?.mall  ?? MALLS[0];
-  const [party,   setParty]   = useState(2);
-  const [loading, setLoading] = useState(false);
+  const [party,        setParty]        = useState(2);
+  const [loading,      setLoading]      = useState(false);
+  const [partiesAhead, setPartiesAhead] = useState<number | null>(null);
+  const [error,        setError]        = useState("");
+
+  useEffect(() => {
+    getQueueCount(String(store.id)).then(setPartiesAhead).catch(() => {});
+  }, [store.id]);
 
   async function reserve() {
-    setLoading(true);
-    try { await reserveQueue(String(store.id), String(mall.id), party, store.wait); } catch { /* demo */ }
-    go("reserved", { mall, store });
+    setLoading(true); setError("");
+    let reservationId: string | undefined;
+    try {
+      const r = await reserveQueue(String(store.id), String(mall.id), party, store.wait);
+      reservationId = r?.id;
+      go("reserved", { mall, store, reservationId });
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "ไม่สามารถจองคิวได้ กรุณาลองใหม่");
+      setLoading(false);
+    }
   }
 
   return (
@@ -46,7 +59,7 @@ export default function ReserveScreen({ t, go, state }: ScreenProps) {
         </div>
         <div className="card" style={{ textAlign: "center" }}>
           <p style={{ color: "var(--muted)", fontSize: 12, marginBottom: 6 }}>{t.partiesAhead}</p>
-          <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1 }}>4</p>
+          <p style={{ fontSize: 32, fontWeight: 700, lineHeight: 1 }}>{partiesAhead ?? "—"}</p>
           <p style={{ color: "var(--muted)", fontSize: 13, marginTop: 4 }}>parties</p>
         </div>
       </div>
@@ -71,6 +84,9 @@ export default function ReserveScreen({ t, go, state }: ScreenProps) {
           ))}
         </div>
       </div>
+
+      {/* Error */}
+      {error && <div className="alert alertError"><span>✗</span><span>{error}</span></div>}
 
       {/* CTA */}
       <div className="stack">

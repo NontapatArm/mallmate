@@ -8,9 +8,9 @@ export const MALLS: Mall[] = [
 ];
 
 export const STORES: Store[] = [
-  { id: 1, icon: "🍽️", name: "Siam Kitchen", floor: "L3", wait: 28, type: "restaurant" },
-  { id: 2, icon: "🍜", name: "Ramen House",  floor: "L2", wait: 15, type: "restaurant" },
-  { id: 3, icon: "☕", name: "Café Amazon",  floor: "G",  wait: 8,  type: "restaurant" },
+  { id: 1, icon: "🍽️", name: "Siam Kitchen", floor: "L3", wait: 28, type: "food_and_beverage" },
+  { id: 2, icon: "🍜", name: "Ramen House",  floor: "L2", wait: 15, type: "food_and_beverage" },
+  { id: 3, icon: "☕", name: "Café Amazon",  floor: "G",  wait: 8,  type: "food_and_beverage" },
   { id: 4, icon: "👗", name: "Zara",         floor: "L1", wait: 0,  type: "shopping"   },
   { id: 5, icon: "💊", name: "Watsons",      floor: "G",  wait: 0,  type: "services"   },
 ];
